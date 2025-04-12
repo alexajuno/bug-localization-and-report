@@ -17,6 +17,7 @@ from pygments.lexers import JavaLexer
 from pygments.token import Token
 from datasets import DATASET
 from datetime import datetime
+nltk.download('averaged_perceptron_tagger_eng')
 
 class BugReport:
     """Class representing each bug report"""
