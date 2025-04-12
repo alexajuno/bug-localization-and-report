@@ -2,54 +2,51 @@ from collections import namedtuple
 from pathlib import Path
 
 # Dataset root directory
-_DATASET_ROOT = Path('../data')
+_DATASET_ROOT = Path('./data')
+_SOURCE_FILES = _DATASET_ROOT / 'source-files'
+_BUG_REPORTS = _DATASET_ROOT / 'bug-reports'
 
-Dataset = namedtuple('Dataset', ['name', 'src', 'bug_repo', 'repo_url', 'features'])
+Dataset = namedtuple('Dataset', ['name', 'src', 'bug_repo', 'repo_url'])
 
 # Source codes and bug repositories
 
 aspectj = Dataset(
     'aspectj',
-    _DATASET_ROOT / 'org.aspectj-bug43351/',
-    _DATASET_ROOT / 'AspectJ.txt',
-    "https://github.com/eclipse/org.aspectj/tree/bug433351.git",
-    _DATASET_ROOT / 'features_aspectj.csv'
+    _SOURCE_FILES / 'org.aspectj-bug433351',
+    _BUG_REPORTS / 'AspectJ.txt',
+    "https://github.com/eclipse/org.aspectj/tree/bug433351.git"
 )
 
 eclipse = Dataset(
     'eclipse',
-    _DATASET_ROOT / 'eclipse.platform.ui-johna-402445/',
-    _DATASET_ROOT / 'Eclipse_Platform_UI.txt',
-    "https://github.com/eclipse/eclipse.platform.ui.git",
-    _DATASET_ROOT / 'features_eclipse.csv'
+    _SOURCE_FILES / 'eclipse.platform.ui-johna-402445',
+    _BUG_REPORTS / 'Eclipse_Platform_UI.txt',
+    "https://github.com/eclipse/eclipse.platform.ui.git"
 )
 
 swt = Dataset(
     'swt',
-    _DATASET_ROOT / 'eclipse.platform.swt-xulrunner-31/',
-    _DATASET_ROOT / 'SWT.txt',
-    "https://github.com/eclipse/eclipse.platform.swt.git",
-    _DATASET_ROOT / 'features_swt.csv'
+    _SOURCE_FILES / 'eclipse.platform.swt-xulrunner-31',
+    _BUG_REPORTS / 'SWT.txt',
+    "https://github.com/eclipse/eclipse.platform.swt.git"
 )
 
 tomcat = Dataset(
     'tomcat',
-    _DATASET_ROOT / 'tomcat-7.0.51/',
-    _DATASET_ROOT / 'Tomcat.txt',
-    "https://github.com/apache/tomcat.git",
-    _DATASET_ROOT / 'features_tomcat/'
+    _SOURCE_FILES / 'tomcat-7.0.51',
+    _BUG_REPORTS / 'Tomcat.txt',
+    "https://github.com/apache/tomcat.git"
 )
 
-tomcat1 = Dataset(
-    'tomcat',
-    _DATASET_ROOT / 'tomcat-7.0.51/',
-    _DATASET_ROOT / 'Tomcat.txt',
-    "https://github.com/apache/tomcat.git",
-    _DATASET_ROOT / 'features_tomcat1.csv'
+birt = Dataset(
+    'birt',
+    _SOURCE_FILES / 'birt-20140211-1400',
+    _BUG_REPORTS / 'Birt.txt',
+    "https://github.com/eclipse/birt"
 )
 
 ### Current dataset in use. (change this name to change the dataset)
-DATASET = tomcat
+DATASET = swt
 
 if __name__ == '__main__':
     print(DATASET.name, DATASET.src, DATASET.bug_repo)
