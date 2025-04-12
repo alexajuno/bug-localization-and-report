@@ -1,0 +1,4 @@
+inflection
+nltk
+javalang
+pygments 
