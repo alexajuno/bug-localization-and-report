@@ -1,4 +1,9 @@
 inflection
 nltk
 javalang
-pygments 
+pygments
+numpy
+scikit-learn
+joblib
+torch
+pandas 
