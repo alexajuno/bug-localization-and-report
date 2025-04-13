@@ -81,7 +81,57 @@ def prepare_data(df, report_ids, scaler=None):
     labels = df['match'].values.reshape(-1, 1)
     return features, labels, scaler
 
-def train_and_evaluate_dnn(n_splits=5, epochs=100, batch_size=32, learning_rate=0.001):
+def prepare_data_with_negative_sampling(df, report_ids, n_negative_samples=50, scaler=None):
+    """
+    Prepare data with negative sampling for each positive sample.
+    
+    Args:
+        df: DataFrame containing features
+        report_ids: List of report IDs to process
+        n_negative_samples: Number of negative samples to select per positive sample
+        scaler: Optional pre-fitted StandardScaler
+    """
+    sampled_data = []
+    
+    # Process each report
+    for report_id in report_ids:
+        report_df = df[df['report_id'] == report_id]
+        
+        # Get positive and negative samples
+        positives = report_df[report_df['match'] == 1]
+        negatives = report_df[report_df['match'] == 0]
+        
+        # Log sample counts for debugging
+        print(f"Report {report_id}: {len(positives)} positive, {len(negatives)} negative samples")
+        
+        # Include all positive samples
+        sampled_data.append(positives)
+        
+        # Sample negative examples if we have more than n_negative_samples
+        if len(negatives) > n_negative_samples:
+            sampled_negatives = negatives.sample(n=n_negative_samples, random_state=42)
+        else:
+            sampled_negatives = negatives
+            
+        sampled_data.append(sampled_negatives)
+    
+    # Combine all sampled data
+    sampled_df = pd.concat(sampled_data, ignore_index=True)
+    
+    # Extract features and scale them
+    features = sampled_df[['rVSM_similarity', 'collab_filter', 'classname_similarity', 
+                          'bug_recency', 'bug_frequency']].values
+    
+    if scaler is None:
+        scaler = StandardScaler()
+        features = scaler.fit_transform(features)
+    else:
+        features = scaler.transform(features)
+    
+    labels = sampled_df['match'].values.reshape(-1, 1)
+    return features, labels, scaler
+
+def train_and_evaluate_dnn(n_splits=5, epochs=100, batch_size=32, learning_rate=0.001, n_negative_samples=50):
     # Load features
     features_file = f'output/features_{DATASET.name}.csv'
     df = pd.read_csv(features_file)
@@ -106,8 +156,14 @@ def train_and_evaluate_dnn(n_splits=5, epochs=100, batch_size=32, learning_rate=
         train_df = df[df['report_id'].isin(train_reports)]
         test_df = df[df['report_id'].isin(test_reports)]
         
-        # Prepare data
-        X_train, y_train, scaler = prepare_data(train_df, train_reports)
+        # Prepare data with negative sampling for training
+        print("\nPreparing training data with negative sampling...")
+        X_train, y_train, scaler = prepare_data_with_negative_sampling(
+            train_df, train_reports, n_negative_samples=n_negative_samples
+        )
+        
+        # For testing, use all data without sampling
+        print("\nPreparing test data...")
         X_test, y_test, _ = prepare_data(test_df, test_reports, scaler)
         
         # Create data loaders
@@ -177,4 +233,4 @@ def train_and_evaluate_dnn(n_splits=5, epochs=100, batch_size=32, learning_rate=
     return avg_metrics
 
 if __name__ == '__main__':
-    train_and_evaluate_dnn() 
+    train_and_evaluate_dnn(n_negative_samples=50) 
