@@ -1,6 +1,6 @@
 # Bug Localization Using DNN and rVSM
 
-This project implements a bug localization system that uses both traditional Information Retrieval (rVSM - revised Vector Space Model) and Deep Neural Networks (DNN) to locate source files that need to be fixed given a bug report.
+This project implements a bug localization system that uses both traditional Information Retrieval (rVSM - revised Vector Space Model) and Deep Neural Networks (DNN) to locate source files that need to be fixed given a bug report. Additionally, it includes a Sentence-BERT (SBERT) based semantic similarity approach.
 
 ## Project Structure
 
@@ -11,7 +11,9 @@ This project implements a bug localization system that uses both traditional Inf
 │   └── bug-reports/      # Contains bug report files in XML/TXT format
 ├── output/               # Generated features and results
 │   ├── features_*.csv    # Extracted features for each dataset
-│   └── results_*.csv     # Evaluation results
+│   ├── results_*.csv     # Evaluation results
+│   ├── sbert_similarities_*.csv  # SBERT similarity scores
+│   └── sbert_accuracy_*.csv      # SBERT accuracy metrics
 ├── checkpoints/          # DNN model checkpoints
 │   └── model_fold_*.pt   # Saved model states for each fold
 ├── datasets.py          # Dataset configurations
@@ -19,6 +21,7 @@ This project implements a bug localization system that uses both traditional Inf
 ├── feature_extraction.py # Feature extraction implementation
 ├── rvsm_model.py       # rVSM model implementation
 ├── dnn_model.py        # DNN model implementation
+├── sbert_similarity.py  # SBERT semantic similarity implementation
 ├── main.py             # Main script to run the pipeline
 └── requirements.txt    # Python dependencies
 ```
@@ -39,10 +42,12 @@ This project implements a bug localization system that uses both traditional Inf
   - Collaborative filtering score
   - Bug fixing recency
   - Bug fixing frequency
+  - SBERT semantic similarity
 
 - **Models**:
   - rVSM (revised Vector Space Model)
   - DNN (Deep Neural Network)
+  - SBERT (Sentence-BERT)
 
 - **Evaluation Metrics**:
   - Top-k Accuracy (k=1,5,10)
@@ -62,6 +67,7 @@ This project implements a bug localization system that uses both traditional Inf
   - joblib
   - torch
   - pandas
+  - sentence-transformers
 
 ## Dataset Structure
 
@@ -124,16 +130,33 @@ Supported datasets:
   - K-fold cross-validation
   - Model checkpointing
 
+### SBERT Model
+- Uses pretrained all-MiniLM-L6-v2 model
+- Features:
+  - Semantic understanding of natural language
+  - Contextual embeddings for both bug reports and source code
+  - Efficient batch processing
+  - GPU acceleration when available
+- Process:
+  - Combines bug report summary and description
+  - Processes source code content, comments, class names, and method names
+  - Computes semantic similarity using cosine similarity
+  - Ranks files based on similarity scores
+
 ## Results
 
-Results are saved in two formats:
+Results are saved in multiple formats:
 1. Feature files: `output/features_<dataset>.csv`
    - Contains extracted features for each bug report-source file pair
-   - Used for both models
+   - Used for rVSM and DNN models
 
 2. Results file: `output/results_<dataset>.csv`
-   - Contains evaluation metrics for both models
+   - Contains evaluation metrics for rVSM and DNN models
    - Includes Top-k accuracy, MAP, and MRR
+
+3. SBERT results:
+   - `output/sbert_similarities_<dataset>.csv`: Detailed similarity scores
+   - `output/sbert_accuracy_<dataset>.csv`: Top-k accuracy metrics
 
 ## Checkpoints
 
