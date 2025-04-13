@@ -6,4 +6,5 @@ numpy
 scikit-learn
 joblib
 torch
-pandas 
+pandas
+sentence-transformers 
